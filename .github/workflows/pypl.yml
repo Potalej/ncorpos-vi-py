@@ -31,7 +31,7 @@ jobs:
       # Instalar dependências de sistema (Linux/macOS)
       - name: Install system dependencies
         if: runner.os == 'Linux'
-        run: sudo apt-get update && sudo apt-get install -y gfortran python3-dev libopenblas-dev liblaplack-dev
+        run: sudo apt-get update && sudo apt-get install -y gfortran python3-dev libopenblas-dev
       
       # Build wheels usando cibuildwheel
       - name: Build wheels
