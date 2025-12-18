@@ -13,25 +13,7 @@ enable_language(Fortran)
 
 include(FetchContent)
 include(repos.cmake)
-
-# --------------------------------------------------------------------------
-# Detecta Python
-# --------------------------------------------------------------------------
-if(DEFINED ENV{Python3_EXECUTABLE})
-    set(Python_EXECUTABLE $ENV{Python3_EXECUTABLE})
-else()
-    find_program(Python_EXECUTABLE python3)
-endif()
-
-message(STATUS "Using Python executable: ${Python_EXECUTABLE}")
-
-# Pega o sufixo de extensão da biblioteca Python
-execute_process(
-  COMMAND ${Python_EXECUTABLE} -c
-          "import sysconfig; print(sysconfig.get_config_var('EXT_SUFFIX'))"
-  OUTPUT_VARIABLE PY_EXT_SUFFIX
-  OUTPUT_STRIP_TRAILING_WHITESPACE
-)
+find_package(Python3 REQUIRED COMPONENTS Interpreter Development)
 
 # ============================================================================
 # Biblioteca Fortran (core)
@@ -74,12 +56,15 @@ MESSAGE("suspeito: ${CMAKE_CURRENT_BINARY_DIR}")
 add_custom_command(
   OUTPUT ${F2PY_OUTPUT}
   COMMAND
-    ${CMAKE_COMMAND} -E env
-      LDFLAGS=-Wl,-rpath,'$$ORIGIN'
     ${Python3_EXECUTABLE} -m numpy.f2py
       -c
       -m ${F2PY_MODULE_NAME}
       ${F2PY_WRAPPER}
+
+      --link-args=-Wl,-rpath,$ORIGIN
+      --link-args=-lopenblas
+      --link-args=-llapack
+
       -L$<TARGET_FILE_DIR:valores_iniciais>
       -lvalores_iniciais
       -L$<TARGET_FILE_DIR:utilidades>
@@ -93,6 +78,7 @@ add_custom_command(
   WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}
   COMMENT "Gerando modulo Python via f2py com RPATH=$ORIGIN"
 )
+
 
 add_custom_target(python_module ALL
   DEPENDS ${F2PY_OUTPUT}
