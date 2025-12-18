@@ -13,7 +13,7 @@ enable_language(Fortran)
 
 include(FetchContent)
 include(repos.cmake)
-find_package(Python3 REQUIRED COMPONENTS Interpreter Development)
+find_package(Python3 REQUIRED COMPONENTS Interpreter)
 
 # ============================================================================
 # Biblioteca Fortran (core)
