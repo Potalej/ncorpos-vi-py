@@ -45,7 +45,7 @@ jobs:
             mkdir -p build
             cmake -B build -S . -DPython3_EXECUTABLE=$(which python)
             cmake --build build --config Release
-        run: cibuildwheel --output-dir wheelhouse
+        run: python -m cibuildwheel --output-dir wheelhouse
   
   publicar-testpypi:
     name: Publicar para o TestPyPI
