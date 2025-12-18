@@ -32,7 +32,7 @@ jobs:
       # Instalar dependências de sistema (Linux/macOS)
       - name: Install system dependencies
         if: runner.os == 'Linux'
-        run: sudo apt-get update && sudo apt-get install -y gfortran python3-dev libopenblas-dev
+        run: sudo apt-get update && sudo apt-get install -y gfortran python3-dev libopenblas-dev && sudo pip install numpy
       
       # Configurar CMake garantindo que use o Python correto
       - name: Configure CMake
@@ -46,8 +46,6 @@ jobs:
 
       # Build wheels usando cibuildwheel
       - name: Build wheels
-        env:
-          CIBW_BEFORE_BUILD: pip install numpy
         run: cibuildwheel --output-dir wheelhouse
   
   publicar-testpypi:
