@@ -35,10 +35,24 @@ jobs:
       
       # Build wheels usando cibuildwheel
       - name: Build wheels
-        run: python -m cibuildwheel --output-dir wheelhouse
+        run: |
+          python -m cibuildwheel --output-dir wheelhouse
         env:
-          CIBW_ENVIRONMENT_LINUX: "OPENBLAS_ROOT=/usr"
-          CIBW_BEFORE_BUILD: sudo apt-get update && sudo apt-get install -y libopenblas-dev liblapack-dev pkg-config && pip install numpy
+          # Usa manylinux2014 que JÁ TEM OpenBLAS pré-instalado
+          CIBW_MANYLINUX_X86_64_IMAGE: manylinux2014
+          CIBW_MANYLINUX_I686_IMAGE: manylinux2014
+          
+          # Apenas instala numpy (não tenta instalar OpenBLAS com sudo)
+          CIBW_BEFORE_BUILD_LINUX: "pip install numpy"
+          
+          # Configura variáveis para o CMake encontrar OpenBLAS
+          CIBW_ENVIRONMENT_LINUX: |
+            OPENBLAS_ROOT=/usr
+            OPENBLAS=/usr/lib64
+            LD_LIBRARY_PATH=/usr/lib64:$LD_LIBRARY_PATH
+          
+          # Versões Python compatíveis
+          CIBW_BUILD: "cp38-* cp39-* cp310-* cp311-* cp312-*"
   
   publicar-testpypi:
     name: Publicar para o TestPyPI
