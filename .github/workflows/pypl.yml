@@ -25,21 +25,26 @@ jobs:
           python -m pip install cibuildwheel twine build numpy
 
       # PASSO NOVO: Build SIMPLES sem manylinux
-      - name: Build standard wheel
-        run: |
+      # - name: Build standard wheel
+      #  run: |
           # Instala dependências do sistema (AQUI TEM SUDO!)
-          sudo apt-get update
-          sudo apt-get install -y gfortran libopenblas-dev liblapack-dev
+          # sudo apt-get update
+          # sudo apt-get install -y gfortran libopenblas-dev liblapack-dev
           
           # Build local simples
           # python -m build --wheel --outdir wheelhouse
+      - name: Build wheels with cibuildwheel
+        run: |
           python -m pip install cibuildwheel
           python -m cibuildwheel --output-dir wheelhouse
         env:
-          # Esta é a variável de ambiente mais importante.
-          # Ela diz ao cibuildwheel para usar uma imagem manylinux padrão.
-          CIBW_MANYLINUX_X86_64_IMAGE: manylinux2014
           CIBW_BUILD: "cp310-* cp311-* cp312-*"
+          CIBW_MANYLINUX_X86_64_IMAGE: manylinux2014
+      
+          # 🔥 ESSENCIAL 🔥
+          CIBW_BEFORE_ALL_LINUX: |
+            yum install -y gcc-gfortran openblas-devel lapack-devel
+
 
       - name: Upload artifacts
         uses: actions/upload-artifact@v4
