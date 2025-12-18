@@ -1,4 +1,4 @@
-name: Build and Publish Wheels
+name: Build and Publish TestPyPi
 
 on:
   push:
@@ -7,20 +7,21 @@ on:
   workflow_dispatch:
 
 jobs:
-  build_wheels:
+  build:
     runs-on: ${{ matrix.os }}
     strategy:
       matrix:
         os: [ubuntu-latest, macos-latest, windows-latest]
         python-version: [3.12]
     steps:
-      - uses: actions/checkout@v3
-
-      # Configurar Python
-      - name: Set up Python
-        uses: actions/setup-python@v4
+      - uses: actions/checkout@v6
         with:
-          python-version: ${{ matrix.python-version }}
+          persist-credentials: false
+
+      - name: Set up Python
+        uses: actions/setup-python@v6
+        with:
+          python-version: 3.x
 
       # Instalar cibuildwheel e twine
       - name: Install build tools
@@ -39,10 +40,28 @@ jobs:
       # Build wheels usando cibuildwheel
       - name: Build wheels
         run: cibuildwheel --output-dir wheelhouse
+  
+  publicar-testpypi:
+    name: Publicar para o TestPyPI
+    needs:
+    - build
+    runs-on: ubuntu-latest
 
-      # Upload para PyPI (usando token armazenado em secrets)
-      - name: Publish to PyPI
-        uses: pypa/gh-action-pypi-publish@release/v1
-        with:
-          user: __token__
-          password: ${{ secrets.PYPI_API_TOKEN }}
+    environment:
+      name: testpypi
+      url: https://test.pypi.org/p/ncorpos-vi-py
+
+    permissions:
+      id-token: write
+
+    steps:
+    - name: Download all the dists
+      uses: actions/download-artifact@v6
+      with:
+        name: python-package-distributions
+        path: dist/
+      
+    - name: Publish distribution 📦 to TestPyPI
+      uses: pypa/gh-action-pypi-publish@release/v1
+      with:
+        repository-url: https://test.pypi.org/legacy/
