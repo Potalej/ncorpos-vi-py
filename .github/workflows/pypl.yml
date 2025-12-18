@@ -12,7 +12,6 @@ jobs:
     strategy:
       matrix:
         os: [ubuntu-latest]
-        python-version: [3.12]
     steps:
       - uses: actions/checkout@v6
         with:
@@ -20,14 +19,12 @@ jobs:
 
       - name: Set up Python
         uses: actions/setup-python@v6
-        with:
-          python-version: ${{ matrix.python-version }}
 
       # Instalar cibuildwheel e twine
       - name: Install build tools
         run: |
           python -m pip install --upgrade pip
-          pip install cibuildwheel twine numpy meson ninja
+          python -m pip install cibuildwheel twine numpy meson ninja
 
       # Instalar dependências de sistema (Linux/macOS)
       - name: Install system dependencies
@@ -39,9 +36,7 @@ jobs:
         env:
           CIBW_BEFORE_BUILD: |
             python -m pip install numpy meson ninja
-            # Exporta variáveis para o CMake enxergar Python correto
             export Python3_EXECUTABLE=$(which python)
-            # Cria build do cmake
             mkdir -p build
             cmake -B build -S . -DPython3_EXECUTABLE=$(which python)
             cmake --build build --config Release
