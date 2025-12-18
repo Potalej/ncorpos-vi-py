@@ -34,16 +34,6 @@ jobs:
         if: runner.os == 'Linux'
         run: sudo apt-get update && sudo apt-get install -y gfortran python3-dev libopenblas-dev
       
-      # Configurar CMake garantindo que use o Python correto
-      - name: Configure CMake
-        run: |
-          mkdir -p build
-          cmake -B build -S . -DPython3_EXECUTABLE=$(which python)
-
-      # Build do projeto via CMake
-      - name: Build project with CMake
-        run: cmake --build build --config Release
-
       # Build wheels usando cibuildwheel
       - name: Build wheels
         env:
@@ -51,6 +41,10 @@ jobs:
             python -m pip install numpy meson ninja
             # Exporta variáveis para o CMake enxergar Python correto
             export Python3_EXECUTABLE=$(which python)
+            # Cria build do cmake
+            mkdir -p build
+            cmake -B build -S . -DPython3_EXECUTABLE=$(which python)
+            cmake --build build --config Release
         run: cibuildwheel --output-dir wheelhouse
   
   publicar-testpypi:
