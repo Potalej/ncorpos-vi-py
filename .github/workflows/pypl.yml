@@ -32,11 +32,14 @@ jobs:
           sudo apt-get install -y gfortran libopenblas-dev liblapack-dev
           
           # Build local simples
-          python -m build --wheel --outdir wheelhouse
+          # python -m build --wheel --outdir wheelhouse
+          python -m pip install cibuildwheel
+          python -m cibuildwheel --output-dir wheelhouse
         env:
           # Esta é a variável de ambiente mais importante.
           # Ela diz ao cibuildwheel para usar uma imagem manylinux padrão.
           CIBW_MANYLINUX_X86_64_IMAGE: manylinux2014
+          CIBW_BUILD: "cp310-* cp311-* cp312-*"
 
       - name: Upload artifacts
         uses: actions/upload-artifact@v4
