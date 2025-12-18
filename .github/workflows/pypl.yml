@@ -27,7 +27,7 @@ jobs:
       - name: Install build tools
         run: |
           python -m pip install --upgrade pip
-          pip install cibuildwheel twine numpy
+          pip install cibuildwheel twine numpy meson ninja
 
       # Instalar dependências de sistema (Linux/macOS)
       - name: Install system dependencies
