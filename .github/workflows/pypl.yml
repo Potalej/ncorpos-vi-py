@@ -46,6 +46,11 @@ jobs:
 
       # Build wheels usando cibuildwheel
       - name: Build wheels
+        env:
+          CIBW_BEFORE_BUILD: |
+            python -m pip install numpy meson ninja
+            # Exporta variáveis para o CMake enxergar Python correto
+            export Python3_EXECUTABLE=$(which python)
         run: cibuildwheel --output-dir wheelhouse
   
   publicar-testpypi:
