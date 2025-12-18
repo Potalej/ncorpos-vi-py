@@ -21,7 +21,7 @@ jobs:
       - name: Set up Python
         uses: actions/setup-python@v6
         with:
-          python-version: 3.x
+          python-version: 3.12
 
       # Instalar cibuildwheel e twine
       - name: Install build tools
@@ -32,10 +32,21 @@ jobs:
       # Instalar dependências de sistema (Linux/macOS)
       - name: Install system dependencies
         if: runner.os == 'Linux'
-        run: sudo apt-get update && sudo apt-get install -y gfortran
+        run: sudo apt-get update && sudo apt-get install -y gfortran python3-dev
+        
       - name: Install system dependencies
         if: runner.os == 'macOS'
         run: brew install gcc
+      
+      # Configurar CMake garantindo que use o Python correto
+      - name: Configure CMake
+        run: |
+          mkdir -p build
+          cmake -B build -S . -DPython3_EXECUTABLE=$(which python)
+
+      # Build do projeto via CMake
+      - name: Build project with CMake
+        run: cmake --build build --config Release
 
       # Build wheels usando cibuildwheel
       - name: Build wheels
