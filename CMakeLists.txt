@@ -24,7 +24,7 @@ set(VI_CURRENT_DIR ${CMAKE_CURRENT_SOURCE_DIR}/fortran)
 if (NOT TARGET valores_iniciais)
   message(STATUS "Biblioteca 'valores_iniciais' nao encontrada! baixando do repositorio...")
   FetchContent_Declare(
-    utilidades
+    valores_iniciais
     GIT_REPOSITORY ${VALORES_INICIAIS_REPO}
     GIT_TAG ${VALORES_INICIAIS_TAG}
   )
