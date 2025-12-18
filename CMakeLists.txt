@@ -9,19 +9,34 @@ project(ncorpos_vi
   LANGUAGES Fortran
 )
 
-message(STATUS "SOURCE DIR = ${CMAKE_CURRENT_SOURCE_DIR}")
-message(STATUS "TOP DIR    = ${CMAKE_SOURCE_DIR}")
-
 enable_language(Fortran)
 
 include(FetchContent)
+include(repos.cmake)
 find_package(Python3 REQUIRED COMPONENTS Interpreter Development)
 
 # ============================================================================
 # Biblioteca Fortran (core)
 # ============================================================================
 set(VI_DIR ${CMAKE_SOURCE_DIR}/fortran/)
-SET(VI_CURRENT_DIR ${CMAKE_CURRENT_SOURCE_DIR}/fortran)
+set(VI_CURRENT_DIR ${CMAKE_CURRENT_SOURCE_DIR}/fortran)
+
+if (NOT TARGET valores_iniciais)
+  message(STATUS "Biblioteca 'valores_iniciais' nao encontrada! baixando do repositorio...")
+  FetchContent_Declare(
+    utilidades
+    GIT_REPOSITORY ${VI_REPO}
+    GIT_TAG ${VI_TAG}
+  )
+  FetchContent_MakeAvailable(valores_iniciais)
+else()
+  message(STATUS "Usando a 'valores_iniciais' do programa.")
+endif()
+
+target_link_libraries(valores_iniciais
+  PUBLIC utilidades
+)
+
 include(fortran/libvi.cmake)
 
 # ============================================================================
