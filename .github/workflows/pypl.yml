@@ -44,7 +44,7 @@ jobs:
           CIBW_BEFORE_ALL_LINUX: |
             yum install -y gcc-gfortran openblas-devel lapack-devel
             
-          CIBW_ENVIRONMENT_LINUX: LDFLAGS=-Wl,-rpath,\$ORIGIN -lopenblas -llapack
+          CIBW_ENVIRONMENT_LINUX: 'LDFLAGS="-Wl,-rpath,\$ORIGIN -lopenblas -llapack"'
 
       - name: Upload artifacts
         uses: actions/upload-artifact@v4
