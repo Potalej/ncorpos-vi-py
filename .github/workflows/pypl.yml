@@ -32,11 +32,7 @@ jobs:
       # Instalar dependências de sistema (Linux/macOS)
       - name: Install system dependencies
         if: runner.os == 'Linux'
-        run: sudo apt-get update && sudo apt-get install -y gfortran python3-dev
-        
-      - name: Install system dependencies
-        if: runner.os == 'macOS'
-        run: brew install gcc
+        run: sudo apt-get update && sudo apt-get install -y gfortran python3-dev libopenblas-dev
       
       # Configurar CMake garantindo que use o Python correto
       - name: Configure CMake
