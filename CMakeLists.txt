@@ -18,26 +18,17 @@ find_package(Python3 REQUIRED COMPONENTS Interpreter Development)
 # ============================================================================
 # Biblioteca Fortran (core)
 # ============================================================================
-set(VI_DIR ${CMAKE_SOURCE_DIR}/fortran/)
-set(VI_CURRENT_DIR ${CMAKE_CURRENT_SOURCE_DIR}/fortran)
-
-if (NOT TARGET valores_iniciais)
-  message(STATUS "Biblioteca 'valores_iniciais' nao encontrada! baixando do repositorio...")
-  FetchContent_Declare(
-    valores_iniciais
-    GIT_REPOSITORY ${VALORES_INICIAIS_REPO}
-    GIT_TAG ${VALORES_INICIAIS_TAG}
-  )
-  FetchContent_MakeAvailable(valores_iniciais)
-else()
-  message(STATUS "Usando a 'valores_iniciais' do programa.")
-endif()
-
-target_link_libraries(valores_iniciais
-  PUBLIC utilidades
+message(STATUS "Baixando a biblioteca 'ncorpos_vi'...")
+FetchContent_Declare(
+  ncorpos_vi_f
+  GIT_REPOSITORY ${VALORES_INICIAIS_REPO}
+  GIT_TAG ${VALORES_INICIAIS_TAG}
 )
+FetchContent_MakeAvailable(ncorpos_vi_f)
 
-include(fortran/libvi.cmake)
+# Diretorio com os mods
+message("${ncorpos_vi_f_BINARY_DIR}")
+set(MOD_DIR ${ncorpos_vi_f_BINARY_DIR})
 
 # ============================================================================
 # Wrapper f2py
@@ -60,6 +51,8 @@ set(F2PY_OUTPUT
   ${CMAKE_CURRENT_BINARY_DIR}/${F2PY_MODULE_NAME}${PY_EXT_SUFFIX}
 )
 
+MESSAGE("suspeito: ${CMAKE_CURRENT_BINARY_DIR}")
+
 add_custom_command(
   OUTPUT ${F2PY_OUTPUT}
   COMMAND
@@ -73,7 +66,7 @@ add_custom_command(
       -lvalores_iniciais
       -L$<TARGET_FILE_DIR:utilidades>
       -lutilidades
-      -I${CMAKE_CURRENT_BINARY_DIR}/mod
+      -I${MOD_DIR}/mod
       --quiet
   DEPENDS
     valores_iniciais
