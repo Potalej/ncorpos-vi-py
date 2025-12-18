@@ -17,9 +17,12 @@ jobs:
       - uses: actions/checkout@v4
         with:
           persist-credentials: false
+          submodules: recursive
 
       - name: Set up Python
         uses: actions/setup-python@v5
+        with:
+          python-version: '3.xx'
      
       # Instalar cibuildwheel e twine
       - name: Install build tools
@@ -30,11 +33,14 @@ jobs:
       # Instalar dependências de sistema (Linux/macOS)
       - name: Install system dependencies
         if: runner.os == 'Linux'
-        run: sudo apt-get update && sudo apt-get install -y gfortran python3-dev libopenblas-dev
+        run: sudo apt-get update && sudo apt-get install -y gfortran python3-dev libopenblas-dev liblaplack-dev
       
       # Build wheels usando cibuildwheel
       - name: Build wheels
         run: python -m cibuildwheel --output-dir wheelhouse
+        env:
+          CIBW_ENVIRONMENT_LINUX: "OPENBLAS_ROOT=/usr"
+          CIBW_BEFORE_BUILD: "pip install numpy"
   
   publicar-testpypi:
     name: Publicar para o TestPyPI
