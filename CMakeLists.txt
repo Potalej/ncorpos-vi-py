@@ -25,8 +25,8 @@ if (NOT TARGET valores_iniciais)
   message(STATUS "Biblioteca 'valores_iniciais' nao encontrada! baixando do repositorio...")
   FetchContent_Declare(
     utilidades
-    GIT_REPOSITORY ${VI_REPO}
-    GIT_TAG ${VI_TAG}
+    GIT_REPOSITORY ${VALORES_INICIAIS_REPO}
+    GIT_TAG ${VALORES_INICIAIS_TAG}
   )
   FetchContent_MakeAvailable(valores_iniciais)
 else()
