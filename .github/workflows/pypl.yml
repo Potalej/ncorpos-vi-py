@@ -46,6 +46,8 @@ jobs:
 
       # Build wheels usando cibuildwheel
       - name: Build wheels
+        env:
+          CIBW_BEFORE_BUILD: pip install numpy
         run: cibuildwheel --output-dir wheelhouse
   
   publicar-testpypi:
