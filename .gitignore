@@ -1,0 +1,4 @@
+fortran/
+*.sh
+__pycache__
+*.pyc

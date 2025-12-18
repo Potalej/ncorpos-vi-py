@@ -1,0 +1,30 @@
+[build-system]
+requires = [
+  "scikit-build-core>=0.5",
+  "setuptools",
+  "wheel",
+  "numpy",
+  "meson",
+  "ninja",
+  "meson-python"
+]
+build-backend = "scikit_build_core.build"
+
+[project]
+name = "ncorpos-vi-py"
+version = "0.1.0"
+description = "Geracao de valores iniciais via Fortran"
+authors = [{ name = "potalej" }]
+readme = "README.md"
+license = { file = "LICENSE" }
+dependencies = ["numpy"]
+
+[tool.scikit-build]
+wheel.packages = ["ncorpos_vi"]
+
+[tool.scikit-build.sdist]
+include = [
+  "fortran/**",
+  "CMakeLists.txt",
+  "src/ncorpos_vi/**"
+]
