@@ -13,6 +13,7 @@ enable_language(Fortran)
 
 include(FetchContent)
 include(repos.cmake)
+set(Python3_EXECUTABLE $ENV{Python3_EXECUTABLE} CACHE PATH "Python executable")
 find_package(Python3 REQUIRED COMPONENTS Interpreter Development)
 
 # ============================================================================
