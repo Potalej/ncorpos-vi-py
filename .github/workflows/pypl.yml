@@ -38,7 +38,7 @@ jobs:
         run: python -m cibuildwheel --output-dir wheelhouse
         env:
           CIBW_ENVIRONMENT_LINUX: "OPENBLAS_ROOT=/usr"
-          CIBW_BEFORE_BUILD: "pip install numpy"
+          CIBW_BEFORE_BUILD: sudo apt-get update && sudo apt-get install -y libopenblas-dev liblapack-dev pkg-config && pip install numpy
   
   publicar-testpypi:
     name: Publicar para o TestPyPI
