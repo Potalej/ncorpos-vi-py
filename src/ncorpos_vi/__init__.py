@@ -37,8 +37,8 @@ def _preload_libraries():
     libutilidades = find_library("libutilidades")
     libvalores_iniciais = find_library("libvalores_iniciais")
 
-    ctypes.CDLL(libutilidades)
-    ctypes.CDLL(libvalores_iniciais)
+    ctypes.CDLL(libutilidades, mode=ctypes.RTLD_GLOBAL)
+    ctypes.CDLL(libvalores_iniciais, mode=ctypes.RTLD_GLOBAL)
 
 # Executa o pré-carregamento
 _preload_libraries()
