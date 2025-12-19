@@ -1,0 +1,3 @@
+[submodule "src/ncorpos_vi/ext/ncorpos_valores_iniciais"]
+	path = src/ncorpos_vi/ext/ncorpos_valores_iniciais
+	url = https://github.com/potalej/ncorpos-valores-iniciais

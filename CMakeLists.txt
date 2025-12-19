@@ -10,31 +10,29 @@ project(ncorpos_vi
 )
 
 enable_language(Fortran)
-
-include(FetchContent)
-include(repos.cmake)
 find_package(Python3 REQUIRED COMPONENTS Interpreter)
 
 # ============================================================================
 # Biblioteca Fortran (core)
 # ============================================================================
-message(STATUS "Baixando a biblioteca 'ncorpos_vi'...")
-FetchContent_Declare(
-  ncorpos_vi_f
-  GIT_REPOSITORY ${VALORES_INICIAIS_REPO}
-  GIT_TAG ${VALORES_INICIAIS_TAG}
-)
-FetchContent_MakeAvailable(ncorpos_vi_f)
+add_subdirectory("src/ncorpos_vi/ext/ncorpos_valores_iniciais" valores_iniciais)
+
+# message(STATUS "Baixando a biblioteca 'ncorpos_vi'...")
+# FetchContent_Declare(
+#   ncorpos_vi_f
+#   GIT_REPOSITORY ${VALORES_INICIAIS_REPO}
+#   GIT_TAG ${VALORES_INICIAIS_TAG}
+# )
+# FetchContent_MakeAvailable(ncorpos_vi_f)
 
 # Diretorio com os mods
-message("${ncorpos_vi_f_BINARY_DIR}")
-set(MOD_DIR ${ncorpos_vi_f_BINARY_DIR})
+set(MOD_DIR ${ncorpos_vi_BINARY_DIR})
 
 # ============================================================================
 # Wrapper f2py
 # ============================================================================
 set(F2PY_WRAPPER
-  ${CMAKE_CURRENT_SOURCE_DIR}/bindings/ncorpos_vi.f90
+  ${CMAKE_CURRENT_SOURCE_DIR}/src/ncorpos_vi/ext/ncorpos_vi.f90
 )
 
 set(F2PY_MODULE_NAME _core)
