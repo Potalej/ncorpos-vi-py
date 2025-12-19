@@ -4,26 +4,44 @@ import ctypes
 from pathlib import Path
 
 # Carrega a biblioteca manualmente antes de qualquer import
-def _preload_library():
+def _preload_libraries():
     """Pré-carrega a biblioteca Fortran"""
     package_dir = Path(__file__).parent
-    lib_paths = [
-        package_dir / "_core" / "libvalores_iniciais.so.0",
-        package_dir / "_core" / "libvalores_iniciais.so.0.1.0",
-        package_dir / "_core" / "libvalores_iniciais.so"
-    ]
-    
-    for lib_path in lib_paths:
-        if lib_path.exists():
-            try:
-                ctypes.CDLL(str(lib_path), mode=ctypes.RTLD_GLOBAL)
-                print(f"Preloaded library: {lib_path.name}")
-                break
-            except Exception as e:
-                print(f"Failed to preload {lib_path}: {e}")
+    core_dir = package_dir / "_core"
+
+    def find_library(prefix: str) -> Path:
+        """
+        Encontra a melhor biblioteca compartilhada para um dado prefixo.
+        Prioridade:
+        1) libXXX.so
+        2) libXXX.so.<major>
+        3) libXXX.so.<major>.<minor>.<patch>
+        """
+        if not core_dir.exists():
+            raise RuntimeError(f"Diretório {core_dir} não existe")
+
+        candidates = list(core_dir.glob(f"{prefix}.so*"))
+
+        if not candidates:
+            raise RuntimeError(f"Nenhuma biblioteca encontrada para {prefix}")
+
+        # ordena colocando as mais genéricas primeiro
+        candidates.sort(key=lambda p: (
+            p.suffix != ".so",          # .so primeiro
+            p.name.count(".")           # menos pontos = mais genérica
+        ))
+
+        return candidates[0]
+
+
+    libutilidades = find_library("libutilidades")
+    libvalores_iniciais = find_library("libvalores_iniciais")
+
+    ctypes.CDLL(libutilidades)
+    ctypes.CDLL(libvalores_iniciais)
 
 # Executa o pré-carregamento
-_preload_library()
+_preload_libraries()
 
 from .api import Gerador
 from ._version import __version__
