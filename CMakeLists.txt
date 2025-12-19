@@ -38,7 +38,8 @@ message("\n> Dependencia: ncorpos-valores-iniciais")
 add_subdirectory("src/ncorpos_vi/ext/ncorpos_valores_iniciais" valores_iniciais)
 
 # Diretorio com os mods
-set(MOD_DIR ${ncorpos_vi_BINARY_DIR})
+set(MOD_DIR_UT ${utilidades_BINARY_DIR})
+set(MOD_DIR_VI ${ncorpos_vi_BINARY_DIR})
 
 # ============================================================================
 # Python
@@ -87,7 +88,8 @@ add_custom_command(
       -lvalores_iniciais
       -L$<TARGET_FILE_DIR:utilidades>
       -lutilidades
-      -I${MOD_DIR}/mod
+      -I${MOD_DIR_UT}/mod
+      -I${MOD_DIR_VI}/mod
       --quiet
   DEPENDS
     valores_iniciais
