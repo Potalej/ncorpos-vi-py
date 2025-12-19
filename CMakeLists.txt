@@ -3,30 +3,52 @@
 # ============================================================================
 cmake_minimum_required(VERSION 3.15)
 
+# Capturando a versao do pyproject.toml para centralizar
+file(READ "${CMAKE_SOURCE_DIR}/pyproject.toml" PYPROJECT_CONTENTS)
+string(REGEX MATCH "version *= *\"([^\"]+)\"" _ ${PYPROJECT_CONTENTS})
+set(PACKAGE_VERSION "${CMAKE_MATCH_1}")
+
 project(ncorpos_vi
-  VERSION 0.1.0
+  VERSION ${PACKAGE_VERSION}
   DESCRIPTION "Geracao de valores iniciais"
   LANGUAGES Fortran
 )
 
-enable_language(Fortran)
-find_package(Python3 REQUIRED COMPONENTS Interpreter)
+option(SKBUILD "Should be ON of being build by skbuild, and OFF of being build by regular cmake" OFF)
+
+if (NOT SKBUILD)
+  set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${PROJECT_SOURCE_DIR}/../cmake/")
+endif()
+
+# Safety net
+if(PROJECT_SOURCE_DIR STREQUAL PROJECT_BINARY_DIR)
+  message(
+    FATAL_ERROR
+      "In-source builds not allowed. Please make a new directory (called a build directory) and run CMake from there.\n"
+  )
+endif()
 
 # ============================================================================
 # Biblioteca Fortran (core)
 # ============================================================================
-add_subdirectory("src/ncorpos_vi/ext/ncorpos_valores_iniciais" valores_iniciais)
+message("\n> Dependencia: ncorpos-utilidades")
+add_subdirectory("src/ncorpos_vi/ext/ncorpos_utilidades" utilidades)
 
-# message(STATUS "Baixando a biblioteca 'ncorpos_vi'...")
-# FetchContent_Declare(
-#   ncorpos_vi_f
-#   GIT_REPOSITORY ${VALORES_INICIAIS_REPO}
-#   GIT_TAG ${VALORES_INICIAIS_TAG}
-# )
-# FetchContent_MakeAvailable(ncorpos_vi_f)
+message("\n> Dependencia: ncorpos-valores-iniciais")
+add_subdirectory("src/ncorpos_vi/ext/ncorpos_valores_iniciais" valores_iniciais)
 
 # Diretorio com os mods
 set(MOD_DIR ${ncorpos_vi_BINARY_DIR})
+
+# ============================================================================
+# Python
+# ============================================================================
+find_package(Python3 REQUIRED COMPONENTS Interpreter)
+
+# Gerar src/ncorpos_vi/_version.py
+file(WRITE "${CMAKE_SOURCE_DIR}/src/${PROJECT_NAME}/_version.py"
+"__version__ = \"${PACKAGE_VERSION}\"\n")
+
 
 # ============================================================================
 # Wrapper f2py
@@ -48,8 +70,6 @@ execute_process(
 set(F2PY_OUTPUT
   ${CMAKE_CURRENT_BINARY_DIR}/${F2PY_MODULE_NAME}${PY_EXT_SUFFIX}
 )
-
-MESSAGE("suspeito: ${CMAKE_CURRENT_BINARY_DIR}")
 
 add_custom_command(
   OUTPUT ${F2PY_OUTPUT}
@@ -77,31 +97,36 @@ add_custom_command(
   COMMENT "Gerando modulo Python via f2py com RPATH=$ORIGIN"
 )
 
-
 add_custom_target(python_module ALL
   DEPENDS ${F2PY_OUTPUT}
 )
 
 # ============================================================================
-# INSTALL — ISSO É O QUE FALTAVA
+# Instala
 # ============================================================================
+message("\n> Instalacao")
 
-# Módulo Python gerado pelo f2py
+# Modulo Python gerado pelo f2py
+message(STATUS "Instalando _core")
 install(
   FILES ${F2PY_OUTPUT}
   DESTINATION ncorpos_vi/_core
 )
 
 # Bibliotecas Fortran dependentes
+message(STATUS "Instalando dependencias")
 install(
   TARGETS valores_iniciais utilidades
   LIBRARY DESTINATION ncorpos_vi/_core
 )
 
 # Arquivos Python do pacote
+message(STATUS "Instalando pacote")
 install(
   DIRECTORY ${CMAKE_SOURCE_DIR}/src/ncorpos_vi/
   DESTINATION ncorpos_vi
   FILES_MATCHING
     PATTERN "*.py"
 )
+
+message("")
