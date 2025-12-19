@@ -118,7 +118,7 @@ install(
 # Bibliotecas Fortran dependentes
 message(STATUS "Instalando dependencias")
 install(
-  TARGETS valores_iniciais utilidades
+  TARGETS utilidades valores_iniciais
   LIBRARY DESTINATION ncorpos_vi/_core
 )
 
