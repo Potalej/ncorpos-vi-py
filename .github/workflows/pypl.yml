@@ -23,9 +23,6 @@ jobs:
           python -m pip install cibuildwheel twine build "numpy>=1.26"
           git submodule update --init --recursive
 
-      - name: List _core dir
-        run: ls -lR ncorpos_vi/_core
-
       - name: Build wheels with cibuildwheel
         run: |
           python -m cibuildwheel --output-dir wheelhouse
