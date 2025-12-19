@@ -8,9 +8,9 @@ def _preload_library():
     """Pré-carrega a biblioteca Fortran"""
     package_dir = Path(__file__).parent
     lib_paths = [
-        package_dir / "_core" / "libutilidades.so.0",
-        package_dir / "_core" / "libutilidades.so.0.1.0",
-        package_dir / "_core" / "libutilidades.so"
+        package_dir / "_core" / "libvalores_iniciais.so.0",
+        package_dir / "_core" / "libvalores_iniciais.so.0.1.0",
+        package_dir / "_core" / "libvalores_iniciais.so"
     ]
     
     for lib_path in lib_paths:
