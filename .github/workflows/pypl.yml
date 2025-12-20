@@ -23,17 +23,32 @@ jobs:
           python -m pip install cibuildwheel twine build "numpy>=1.26"
           git submodule update --init --recursive
 
-      - name: Debug wheel contents
+      - name: Debug built wheel contents
         run: |
           python - <<'EOF'
-          import zipfile, glob
-          whl = glob.glob("wheelhouse/*.whl")[0]
-          print("WHEEL:", whl)
-          with zipfile.ZipFile(whl) as z:
-              for f in z.namelist():
-                  if "libutilidades" in f or "_core" in f:
-                      print(f)
+          import zipfile, glob, os
+
+          paths = [
+              "/tmp/cibuildwheel/built_wheel/*.whl",
+              "/tmp/cibuildwheel/repaired_wheel/*.whl",
+          ]
+
+          for p in paths:
+              whls = glob.glob(p)
+              print(f"\nSearching in {p}")
+              if not whls:
+                  print("  -> no wheels found")
+                  continue
+
+              whl = whls[0]
+              print("WHEEL:", whl)
+
+              with zipfile.ZipFile(whl) as z:
+                  for f in z.namelist():
+                      if "libutilidades" in f or "_core" in f:
+                          print(" ", f)
           EOF
+
 
       - name: Debug ELF dependencies
         run: |
