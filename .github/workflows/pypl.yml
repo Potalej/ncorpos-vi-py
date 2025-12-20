@@ -33,23 +33,6 @@ jobs:
       
           CIBW_BEFORE_ALL_LINUX: |
             yum install -y gcc-gfortran openblas-devel lapack-devel
-          
-          CIBW_BEFORE_REPAIR: |
-            echo "===== LISTANDO /tmp/cibuildwheel ====="
-            find /tmp/cibuildwheel -maxdepth 4 -type f || true
-
-            echo "===== PROCURANDO libutilidades ====="
-            find /tmp/cibuildwheel -name "libutilidades.so*" || true
-
-            echo "===== PROCURANDO _core ====="
-            find /tmp/cibuildwheel -name "*_core*.so" || true
-
-            echo "===== LDD DO _core ====="
-            for f in $(find /tmp/cibuildwheel -name "*_core*.so"); do
-              echo "--- $f"
-              ldd $f || true
-              readelf -d $f | grep -E 'RPATH|RUNPATH' || true
-            done
             
           CIBW_ENVIRONMENT_LINUX: 'LDFLAGS="-Wl,-rpath,\$ORIGIN -lopenblas -llapack"'
 
