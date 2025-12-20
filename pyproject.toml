@@ -12,7 +12,7 @@ build-backend = "scikit_build_core.build"
 
 [project]
 name = "ncorpos-vi-py"
-version = "0.0.3"
+version = "0.0.4"
 description = "Geracao de valores iniciais via Fortran"
 authors = [{ name = "potalej", email="oapotalej@gmail.com" }]
 maintainers = [{ name = "potalej", email="oapotalej@gmail.com" }]
