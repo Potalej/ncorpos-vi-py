@@ -14,6 +14,8 @@ project(ncorpos_vi
   LANGUAGES Fortran
 )
 
+include(GNUInstallDirs)
+
 option(SKBUILD "Should be ON of being build by skbuild, and OFF of being build by regular cmake" OFF)
 
 if (NOT SKBUILD)
@@ -104,42 +106,24 @@ add_custom_target(python_module ALL
 )
 
 # ============================================================================
-# Garantir que as libs fiquem ao lado do _core.so (necessário para auditwheel)
-# ============================================================================
-add_custom_command(
-  TARGET python_module
-  POST_BUILD
-
-  # utilidades
-  COMMAND ${CMAKE_COMMAND} -E copy
-    $<TARGET_FILE:utilidades>
-    ${CMAKE_CURRENT_BINARY_DIR}
-
-  # valores_iniciais
-  COMMAND ${CMAKE_COMMAND} -E copy
-    $<TARGET_FILE:valores_iniciais>
-    ${CMAKE_CURRENT_BINARY_DIR}
-
-  COMMENT "Copiando libutilidades e libvalores_iniciais para junto do _core.so"
-)
-
-# ============================================================================
 # Instala
 # ============================================================================
 message("\n> Instalacao")
+
+message("VEJA: ${CMAKE_INSTALL_LIBDIR}")
 
 # Modulo Python gerado pelo f2py
 message(STATUS "Instalando _core")
 install(
   FILES ${F2PY_OUTPUT}
-  DESTINATION ncorpos_vi/_core
+  DESTINATION ${CMAKE_SOURCE_DIR}/ncorpos_vi/_core
 )
 
 # Bibliotecas Fortran dependentes
 message(STATUS "Instalando dependencias")
 install(
   TARGETS utilidades valores_iniciais
-  LIBRARY DESTINATION ncorpos_vi/_core
+  LIBRARY DESTINATION ${CMAKE_SOURCE_DIR}/ncorpos_vi/_core
 )
 
 # Arquivos Python do pacote
