@@ -8,13 +8,11 @@ file(READ "${CMAKE_SOURCE_DIR}/pyproject.toml" PYPROJECT_CONTENTS)
 string(REGEX MATCH "version *= *\"([^\"]+)\"" _ ${PYPROJECT_CONTENTS})
 set(PACKAGE_VERSION "${CMAKE_MATCH_1}")
 
-project(ncorpos_vi
+project(ncorpos_vi_py
   VERSION ${PACKAGE_VERSION}
   DESCRIPTION "Geracao de valores iniciais"
   LANGUAGES Fortran
 )
-
-include(GNUInstallDirs)
 
 option(SKBUILD "Should be ON of being build by skbuild, and OFF of being build by regular cmake" OFF)
 
@@ -86,16 +84,16 @@ add_custom_command(
       --link-args=-lopenblas
       --link-args=-llapack
 
-      -L$<TARGET_FILE_DIR:valores_iniciais>
-      -lvalores_iniciais
       -L$<TARGET_FILE_DIR:utilidades>
       -lutilidades
+      -L$<TARGET_FILE_DIR:valores_iniciais>
+      -lvalores_iniciais
       -I${MOD_DIR_UT}/mod
       -I${MOD_DIR_VI}/mod
       --quiet
   DEPENDS
-    valores_iniciais
     utilidades
+    valores_iniciais
     ${F2PY_WRAPPER}
   WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}
   COMMENT "Gerando modulo Python via f2py com RPATH=$ORIGIN"
@@ -110,20 +108,18 @@ add_custom_target(python_module ALL
 # ============================================================================
 message("\n> Instalacao")
 
-message("VEJA: ${CMAKE_INSTALL_LIBDIR}")
-
 # Modulo Python gerado pelo f2py
 message(STATUS "Instalando _core")
 install(
   FILES ${F2PY_OUTPUT}
-  DESTINATION ${CMAKE_SOURCE_DIR}/ncorpos_vi/_core
+  DESTINATION ncorpos_vi/_core
 )
 
 # Bibliotecas Fortran dependentes
 message(STATUS "Instalando dependencias")
 install(
   TARGETS utilidades valores_iniciais
-  LIBRARY DESTINATION ${CMAKE_SOURCE_DIR}/ncorpos_vi/_core
+  LIBRARY DESTINATION ncorpos_vi/_core
 )
 
 # Arquivos Python do pacote
