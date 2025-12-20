@@ -12,12 +12,17 @@ build-backend = "scikit_build_core.build"
 
 [project]
 name = "ncorpos-vi-py"
-version = "0.0.2"
+version = "0.0.3"
 description = "Geracao de valores iniciais via Fortran"
-authors = [{ name = "potalej" }]
+authors = [{ name = "potalej", email="oapotalej@gmail.com" }]
+maintainers = [{ name = "potalej", email="oapotalej@gmail.com" }]
 readme = "README.md"
 license = { file = "LICENSE" }
 dependencies = ["numpy"]
+keywords = ["n-corpos"]
+
+[project.urls]
+Repository = "https://github.com/potalej/ncorpos-vi-py"
 
 [tool.scikit-build]
 wheel.packages = ["ncorpos_vi"]
