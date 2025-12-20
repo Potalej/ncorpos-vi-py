@@ -23,40 +23,6 @@ jobs:
           python -m pip install cibuildwheel twine build "numpy>=1.26"
           git submodule update --init --recursive
 
-      - name: Debug built wheel contents
-        run: |
-          python - <<'EOF'
-          import zipfile, glob, os
-
-          paths = [
-              "/tmp/cibuildwheel/built_wheel/*.whl",
-              "/tmp/cibuildwheel/repaired_wheel/*.whl",
-          ]
-
-          for p in paths:
-              whls = glob.glob(p)
-              print(f"\nSearching in {p}")
-              if not whls:
-                  print("  -> no wheels found")
-                  continue
-
-              whl = whls[0]
-              print("WHEEL:", whl)
-
-              with zipfile.ZipFile(whl) as z:
-                  for f in z.namelist():
-                      if "libutilidades" in f or "_core" in f:
-                          print(" ", f)
-          EOF
-
-
-      - name: Debug ELF dependencies
-        run: |
-          unzip -q wheelhouse/*.whl -d /tmp/w
-          echo "=== ldd _core ==="
-          ldd /tmp/w/ncorpos_vi/_core/_core*.so || true
-
-
       - name: Build wheels with cibuildwheel
         run: |
           python -m cibuildwheel --output-dir wheelhouse
@@ -67,6 +33,23 @@ jobs:
       
           CIBW_BEFORE_ALL_LINUX: |
             yum install -y gcc-gfortran openblas-devel lapack-devel
+          
+          CIBW_BEFORE_REPAIR: |
+            echo "===== LISTANDO /tmp/cibuildwheel ====="
+            find /tmp/cibuildwheel -maxdepth 4 -type f || true
+
+            echo "===== PROCURANDO libutilidades ====="
+            find /tmp/cibuildwheel -name "libutilidades.so*" || true
+
+            echo "===== PROCURANDO _core ====="
+            find /tmp/cibuildwheel -name "*_core*.so" || true
+
+            echo "===== LDD DO _core ====="
+            for f in $(find /tmp/cibuildwheel -name "*_core*.so"); do
+              echo "--- $f"
+              ldd $f || true
+              readelf -d $f | grep -E 'RPATH|RUNPATH' || true
+            done
             
           CIBW_ENVIRONMENT_LINUX: 'LDFLAGS="-Wl,-rpath,\$ORIGIN -lopenblas -llapack"'
 
