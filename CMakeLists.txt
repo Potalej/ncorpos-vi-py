@@ -47,7 +47,7 @@ set(MOD_DIR_VI ${ncorpos_vi_BINARY_DIR})
 find_package(Python3 REQUIRED COMPONENTS Interpreter)
 
 # Gerar src/ncorpos_vi/_version.py
-file(WRITE "${CMAKE_SOURCE_DIR}/src/${PROJECT_NAME}/_version.py"
+file(WRITE "${CMAKE_SOURCE_DIR}/src/ncorpos_vi/_version.py"
 "__version__ = \"${PACKAGE_VERSION}\"\n")
 
 
@@ -117,13 +117,16 @@ install(
 
 # Bibliotecas Fortran dependentes
 message(STATUS "Instalando dependencias")
-install(
-  TARGETS utilidades
-  LIBRARY DESTINATION ncorpos_vi/_core
+set_target_properties(utilidades PROPERTIES
+  INSTALL_RPATH "$ORIGIN"
+  BUILD_WITH_INSTALL_RPATH ON
 )
-
+set_target_properties(valores_iniciais PROPERTIES
+  INSTALL_RPATH "$ORIGIN"
+  BUILD_WITH_INSTALL_RPATH ON
+)
 install(
-  TARGETS valores_iniciais
+  TARGETS utilidades valores_iniciais
   LIBRARY DESTINATION ncorpos_vi/_core
 )
 
