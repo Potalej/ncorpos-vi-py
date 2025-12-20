@@ -104,6 +104,26 @@ add_custom_target(python_module ALL
 )
 
 # ============================================================================
+# Garantir que as libs fiquem ao lado do _core.so (necessário para auditwheel)
+# ============================================================================
+add_custom_command(
+  TARGET python_module
+  POST_BUILD
+
+  # utilidades
+  COMMAND ${CMAKE_COMMAND} -E copy
+    $<TARGET_FILE:utilidades>
+    ${CMAKE_CURRENT_BINARY_DIR}
+
+  # valores_iniciais
+  COMMAND ${CMAKE_COMMAND} -E copy
+    $<TARGET_FILE:valores_iniciais>
+    ${CMAKE_CURRENT_BINARY_DIR}
+
+  COMMENT "Copiando libutilidades e libvalores_iniciais para junto do _core.so"
+)
+
+# ============================================================================
 # Instala
 # ============================================================================
 message("\n> Instalacao")
