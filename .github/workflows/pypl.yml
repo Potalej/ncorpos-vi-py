@@ -23,6 +23,25 @@ jobs:
           python -m pip install cibuildwheel twine build "numpy>=1.26"
           git submodule update --init --recursive
 
+      - name: Debug wheel contents
+        run: |
+          python - <<'EOF'
+          import zipfile, glob
+          whl = glob.glob("wheelhouse/*.whl")[0]
+          print("WHEEL:", whl)
+          with zipfile.ZipFile(whl) as z:
+              for f in z.namelist():
+                  if "libutilidades" in f or "_core" in f:
+                      print(f)
+          EOF
+
+      - name: Debug ELF dependencies
+        run: |
+          unzip -q wheelhouse/*.whl -d /tmp/w
+          echo "=== ldd _core ==="
+          ldd /tmp/w/ncorpos_vi/_core/_core*.so || true
+
+
       - name: Build wheels with cibuildwheel
         run: |
           python -m cibuildwheel --output-dir wheelhouse
