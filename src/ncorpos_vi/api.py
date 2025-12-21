@@ -1,4 +1,5 @@
 from ._core._core import ncorpos_vi
+import ncorpos_utilidades as nut
 
 class Gerador:
   """
@@ -137,7 +138,7 @@ class Gerador:
     # Configurando no fortran
     ncorpos_vi.parametros_momentos(distribuicao, regiao, intervalo)
 
-  def gerar (self):
+  def gerar (self, exibir=True):
     """
     Geracao de valores iniciais.
     """
@@ -167,3 +168,41 @@ class Gerador:
     self.massas = ncorpos_vi.massas_c
     self.posicoes = ncorpos_vi.posicoes_c
     self.momentos = ncorpos_vi.momentos_c
+
+    # Calcula o estado do sistema  
+    self.atualizar_estado()
+
+    # se quiser exibir o estado
+    if exibir: self.exibir_estado()
+
+  def atualizar_estado (self):
+    """
+    Calcula os observaveis do sistema conforme o estado atual.
+    """
+    self.V = nut.energia_potencial(self.massas, self.posicoes, self.G, self.eps)
+    self.T = nut.energia_cinetica(self.massas, self.momentos)
+    self.E = self.V + self.T
+    
+    self.J = nut.momento_angular_total(self.posicoes, self.momentos)
+    self.P = nut.momento_linear_total(self.momentos)
+
+    self.I = nut.momento_inercia(self.massas, self.posicoes)
+    self.D = nut.momento_dilatacao(self.posicoes, self.momentos)
+    
+    self.virial_Fq = nut.virial_potencial_amortecido(self.massas, self.posicoes, self.G, self.eps)
+    self.virial = 2*self.T + self.virial_Fq
+
+  def exibir_estado (self):
+    print(f"\n> ESTADO ATUAL DO SISTEMA:\n")
+    print(f"- Energia cinetica (T): \t {self.T}")
+    print(f"- Energia potencial (V):\t {self.V} ")
+    print(f"- Energia total (E):    \t {self.E}")
+    print()
+    print(f"- Momento angular total (J):\t {self.J}")
+    print(f"- Momento linear total (P): \t {self.P}")
+    print()
+    print(f"- Momento de inercia (I):  \t {self.I}")
+    print(f"- Momento de dilatacao (D):\t {self.D}")
+    print()
+    print(f"- Termo de virial (<F,q>):\t {self.virial_Fq}")
+    print(f"- Virial (2*T + <F,q>):   \t {self.virial}")
