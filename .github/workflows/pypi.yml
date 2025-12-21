@@ -2,8 +2,8 @@ name: Build and Publish TestPyPi
 
 on:
   push:
-    tags:
-      - 'v*'
+    branches:
+      - main
   workflow_dispatch:
 
 jobs:
