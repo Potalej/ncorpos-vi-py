@@ -138,31 +138,70 @@ class Gerador:
     # Configurando no fortran
     ncorpos_vi.parametros_momentos(distribuicao, regiao, intervalo)
 
-  def gerar (self, exibir=True):
+  def gerar (self, exibir=False):
     """
     Geracao de valores iniciais.
     """
-    print("Gerando valores iniciais com as seguintes configuracoes: ")
-    print(f"N = {self.N} / G = {self.G} / eps = {self.eps} / modo = {self.modo}")
-    print(f"Constantes de movimento: E = {self.energia} / J = {self.angular} / P = {self.linear}")
-    
-    print("\nMassas:")
-    print(f" - intervalo = {self.massas_parametros['intervalo']}")
-    print(f" - normalizadas = {self.massas_parametros['normalizadas']}")
-    
-    print("\nPosicoes:")
-    print(f" - distribuicao = {self.posicoes_parametros['distribuicao']}")
-    print(f" - regiao = {self.posicoes_parametros['regiao']}")
-    print(f" - intervalo = {self.posicoes_parametros['intervalo']}")
-    
-    print("\nMomentos lineares:")
-    print(f" - distribuicao = {self.momentos_parametros['distribuicao']}")
-    print(f" - regiao = {self.momentos_parametros['regiao']}")
-    print(f" - intervalo = {self.momentos_parametros['intervalo']}")
-    print()
+    if exibir:
+      print("Gerando valores iniciais com as seguintes configuracoes: ")
+      print(f"N = {self.N} / G = {self.G} / eps = {self.eps} / modo = {self.modo}")
+      print(f"Constantes de movimento: E = {self.energia} / J = {self.angular} / P = {self.linear}")
+      
+      print("\nMassas:")
+      print(f" - intervalo = {self.massas_parametros['intervalo']}")
+      print(f" - normalizadas = {self.massas_parametros['normalizadas']}")
+      
+      print("\nPosicoes:")
+      print(f" - distribuicao = {self.posicoes_parametros['distribuicao']}")
+      print(f" - regiao = {self.posicoes_parametros['regiao']}")
+      print(f" - intervalo = {self.posicoes_parametros['intervalo']}")
+      
+      print("\nMomentos lineares:")
+      print(f" - distribuicao = {self.momentos_parametros['distribuicao']}")
+      print(f" - regiao = {self.momentos_parametros['regiao']}")
+      print(f" - intervalo = {self.momentos_parametros['intervalo']}")
+      print()
 
     # Gera
-    ncorpos_vi.gerar()
+    ncorpos_vi.gerar_c()
+
+    # Salva
+    self.massas = ncorpos_vi.massas_c
+    self.posicoes = ncorpos_vi.posicoes_c
+    self.momentos = ncorpos_vi.momentos_c
+
+    # Calcula o estado do sistema  
+    self.atualizar_estado()
+
+    # se quiser exibir o estado
+    if exibir: self.exibir_estado()
+    
+  def condicionar (self, exibir=True):
+    """
+    Condicionamento de valores iniciais.
+    """
+    if exibir:
+      print("Condicionando valores iniciais com as seguintes configuracoes: ")
+      print(f"N = {self.N} / G = {self.G} / eps = {self.eps} / modo = {self.modo}")
+      print(f"Constantes de movimento: E = {self.energia} / J = {self.angular} / P = {self.linear}")
+      
+      print("\nMassas:")
+      print(f" - intervalo = {self.massas_parametros['intervalo']}")
+      print(f" - normalizadas = {self.massas_parametros['normalizadas']}")
+      
+      print("\nPosicoes:")
+      print(f" - distribuicao = {self.posicoes_parametros['distribuicao']}")
+      print(f" - regiao = {self.posicoes_parametros['regiao']}")
+      print(f" - intervalo = {self.posicoes_parametros['intervalo']}")
+      
+      print("\nMomentos lineares:")
+      print(f" - distribuicao = {self.momentos_parametros['distribuicao']}")
+      print(f" - regiao = {self.momentos_parametros['regiao']}")
+      print(f" - intervalo = {self.momentos_parametros['intervalo']}")
+      print()
+
+    # Gera
+    ncorpos_vi.condicionar_c()
 
     # Salva
     self.massas = ncorpos_vi.massas_c

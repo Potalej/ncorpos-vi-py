@@ -8,7 +8,8 @@ module ncorpos_vi
   PRIVATE
   type(sorteio), TARGET, SAVE :: sorteio_global
 
-  PUBLIC parametros, parametros_massas, parametros_posicoes, parametros_momentos, gerar, &
+  PUBLIC parametros, parametros_massas, parametros_posicoes, parametros_momentos, &
+         gerar_c, condicionar_c, &
          massas_c, posicoes_c, momentos_c
   
   REAL(pf), ALLOCATABLE :: massas(:), posicoes(:,:), momentos(:,:)
@@ -79,7 +80,7 @@ contains
     sorteio_global % momentos % intervalo = intervalo
   END SUBROUTINE
 
-  SUBROUTINE gerar ()
+  SUBROUTINE gerar_c ()
     type(sorteio), pointer :: sorteio_local
 
     sorteio_local => sorteio_global
@@ -89,38 +90,22 @@ contains
     IF (ALLOCATED(posicoes)) DEALLOCATE(posicoes)
     IF (ALLOCATED(momentos)) DEALLOCATE(momentos)
     
-    CALL condicionar(sorteio_local, massas, posicoes, momentos)
+    CALL gerar(sorteio_local, massas, posicoes, momentos)
 
     massas_c = massas
     posicoes_c = posicoes
     momentos_c = momentos
   END SUBROUTINE
 
-  FUNCTION get_massas ()
-    REAL(c_double) :: get_massas(SIZE(massas))
-    get_massas = massas
-  END FUNCTION
+  SUBROUTINE condicionar_c ()
+    type(sorteio), pointer :: sorteio_local
 
-  SUBROUTINE get_posicoes (posicoes)
-    REAL(pf), INTENT(OUT), ALLOCATABLE:: posicoes(:,:)
+    sorteio_local => sorteio_global
+    
+    CALL condicionar(sorteio_local, massas, posicoes, momentos)
+
+    massas_c = massas
+    posicoes_c = posicoes
+    momentos_c = momentos
   END SUBROUTINE
-
-  SUBROUTINE get_momentos (momentos)
-    REAL(pf), INTENT(OUT), ALLOCATABLE :: momentos(:,:)
-  END SUBROUTINE
-
-  ! subroutine sorteio_set_G(G) bind(C)
-  !   real(c_double), value :: G
-  !   sorteio_global%G = G
-  ! end subroutine
-
-  ! subroutine sorteio_run(massas, pos, mom)
-  !   USE ico_c_binding
-  !   real(c_double), allocatable, intent(out) :: massas(:)
-  !   real(c_double), allocatable, intent(out) :: pos(:,:)
-  !   real(c_double), allocatable, intent(out) :: mom(:,:)
-
-  !   call condicionar(sorteio_global, massas, pos, mom)
-  ! end subroutine
-
-end module
+END MODULE

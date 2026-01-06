@@ -9,7 +9,7 @@ def _preload_libraries():
     package_dir = Path(__file__).parent
     core_dir = package_dir / "_core"
 
-    def find_library(prefix: str) -> Path:
+    def encontrar_lib (prefixo: str) -> Path:
         """
         Encontra a melhor biblioteca compartilhada para um dado prefixo.
         Prioridade:
@@ -20,23 +20,23 @@ def _preload_libraries():
         if not core_dir.exists():
             raise RuntimeError(f"Diretório {core_dir} não existe")
 
-        candidates = list(core_dir.glob(f"{prefix}.so*"))
+        candidatos = list(core_dir.glob(f"{prefixo}.so*"))
 
-        if not candidates:
-            raise RuntimeError(f"Nenhuma biblioteca encontrada para {prefix}")
+        if not candidatos:
+            raise RuntimeError(f"Nenhuma biblioteca encontrada para {prefixo}")
 
         # ordena colocando as mais genéricas primeiro
-        candidates.sort(key=lambda p: (
+        candidatos.sort(key=lambda p: (
             p.suffix != ".so",          # .so primeiro
             p.name.count(".")           # menos pontos = mais genérica
         ))
 
-        return candidates[0]
+        return candidatos[0]
 
 
-    libutilidades = find_library("libutilidades")
-    libvalores_iniciais = find_library("libvalores_iniciais")
-
+    libutilidades = encontrar_lib("libutilidades")
+    libvalores_iniciais = encontrar_lib("libvalores_iniciais")
+    
     ctypes.CDLL(libutilidades, mode=ctypes.RTLD_GLOBAL)
     ctypes.CDLL(libvalores_iniciais, mode=ctypes.RTLD_GLOBAL)
 
